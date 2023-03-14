@@ -1,0 +1,76 @@
+/*
+    #5BC0EB 
+    #FDE74C
+    #9BC53D
+    #E55934
+    #FA7921
+*/
+
+*{
+    padding: 0;
+    margin: 0;
+    font-family: Calibri;
+}
+
+body{
+    overflow: hidden;
+    background: rgba(2, 204, 255, 0.3);
+}
+
+.ball{
+    border-radius: 100px;
+    left: 50%;
+    padding: 35%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.ball.selected{
+    border: 4px solid black;
+}
+
+.board{
+    border: 1px solid black;
+    display: flex;
+    flex-direction: column;  
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    height: 60vmin;
+    width: 60vmin;
+    background: rgb(230, 230, 230);
+}
+
+.board__row{
+    border-bottom: 1px solid black;
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    position: relative;
+    width: 100%;  
+}
+
+.board__row__tile{  
+    border-right: 1px solid black;
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.board__row__tile.selected{  
+    background: black;
+}
+
+.board__row__tile.openList{  
+    background: rgb(0, 163, 0);
+}
+
+.board__row__tile.closedList{  
+    background: rgb(163, 0, 0);
+}
+
+.board__row__tile.finalPath{  
+    background: rgb(0, 132, 255);
+}
