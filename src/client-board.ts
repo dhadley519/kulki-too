@@ -21,6 +21,10 @@ export interface Position {
 	readonly y: number;
 }
 
+export interface GameOver {
+	command: 'GAME_OVER';
+}
+
 export interface AddBall extends ColorAndPosition {
 	command: 'ADD';
 }
@@ -39,8 +43,6 @@ export interface PathResult extends MovePath {
 	openList: CostedPosition[];
 	closedList: CostedPosition[];
 }
-
-export type FailedPathResult = PathResult
 
 export interface SuccessfulPathResult extends PathResult {
 	finalPath: CostedPosition[];
@@ -63,6 +65,7 @@ class BoardView {
 	private selectedTilePosition: Position | undefined; // tile with selected ball (first click to select, second click to move)
 	private pathResponse: PathResult | undefined; // only for moving active ball
 	constructor(boardSize: BoardSize) {
+		document.getElementById("reset_link")?.addEventListener('click', this.reset);
 		const boardElement = document.querySelector('#board');
 		if (!boardElement) {
 			console.error("abort, can't find board element")
@@ -100,10 +103,8 @@ class BoardView {
 	}
 
 	start() {
-		const init = {
-			method: "GET",
-		};
-		fetch("http://localhost:3000/start", init)
+		const init:RequestInit = {method:"GET", credentials:"include"};
+		fetch("http://127.0.0.1:8080/start", init)
 			.then(response => response.json())
 			.then(data => this.processAddCommands(data as AddBall[]))
 			.catch(reason => console.error(`failure to start game. ${JSON.stringify(reason)}`));
@@ -207,6 +208,7 @@ class BoardView {
 				const ball = tile.firstChild;
 				if (ball && ball instanceof HTMLElement) {
 					ball.classList.remove('selected');
+					this.selectedTilePosition = undefined;
 					return true;
 				}
 			}
@@ -216,24 +218,31 @@ class BoardView {
 	}
 
 	private onMouseOver() {
+		const FEATURE_FLAG_SHOW_PATH=false
 		return (event: MouseEvent): void => {
 			// if there is selected tile and target has no child(tile with no ball) and target is not ball:
 			const tilePosition = this.getTilePosition(event.target as HTMLElement);
-			if (tilePosition && this.selectedTilePosition) {
+			if (tilePosition && !this.hasBall(tilePosition) && this.selectedTilePosition) {
 				const hovPos: MovePath = {
 					to: tilePosition, from: this.selectedTilePosition
 				}
-				const init = {
+
+				const init:RequestInit = {
+					credentials:"include",
 					method: "POST", headers: {
 						"Content-Type": "application/json",
 					}, body: JSON.stringify(hovPos)
 				};
-				fetch("http://localhost:3000/hover", init)
+				fetch("http://127.0.0.1:8080/hover", init)
 					.then(response => response.json())
 					.then(data => {
 						this.clearPaths();
-						this.pathResponse = data as PathResult;
-						this.highlightFinalPath();
+						if(data.success) {
+							this.pathResponse = data as PathResult;
+							if(FEATURE_FLAG_SHOW_PATH) {
+								this.highlightFinalPath();
+							}
+						}
 					})
 					.catch(reason => console.error(`failure to get path response. ${JSON.stringify(reason)}`));
 			}
@@ -283,16 +292,17 @@ class BoardView {
 	private moveSelectedTileTo(clickedPos: Position): boolean {
 		if (this.isBoardConsistentAndUpToDate(clickedPos)) {
 			//send move request
-			const init = {
+			const init:RequestInit = {
+				credentials:"include",
 				method: "POST", headers: {
-					"Content-Type": "application/json",
+					"Content-Type": "application/json"
 				}, body: JSON.stringify({
 					from: this.selectedTilePosition, to: clickedPos, serverSideMoveSuccess: false
 				})
 			};
-			fetch("http://localhost:3000/move", init)
+			fetch("http://127.0.0.1:8080/move", init)
 				.then(response => response.json())
-				.then(data => this.processAddAndRemoveCommands(data as (AddBall|RemoveBall)[]))
+				.then(data => this.processAddAndRemoveCommands(data as (GameOver |AddBall|RemoveBall)[]))
 				.catch(reason => console.error(`failure to move. ${JSON.stringify(reason)}`));
 			return true;
 		}
@@ -300,7 +310,7 @@ class BoardView {
 		return false;
 	}
 
-	private processAddAndRemoveCommands(commands: Array<(AddBall | RemoveBall)>) {
+	private processAddAndRemoveCommands(commands: Array<(GameOver | AddBall | RemoveBall)>) {
 		this.selectedTilePosition = undefined;
 		commands.forEach(n => {
 			switch (n.command) {
@@ -312,6 +322,10 @@ class BoardView {
 					this.removeBall(n);
 					break;
 				}
+				case "GAME_OVER": {
+					gameOver();
+					break;
+				}
 				default: {
 					console.error(`command match fallthrough ${JSON.stringify(n)}`);
 				}
@@ -321,10 +335,11 @@ class BoardView {
 	}
 
 	private updateStats(): void {
-		const init = {
-			method: "GET"
+		const init:RequestInit = {
+			method: "GET",
+			credentials:"include"
 		};
-		fetch("http://localhost:3000/statistics", init)
+		fetch("http://127.0.0.1:8080/statistics", init)
 			.then(response => response.json())
 			.then(data => {
 				const tileCountElement: Element | null = document.querySelector('#emptyTiles');
@@ -352,6 +367,67 @@ class BoardView {
 			});
 		}
 	}
+
+	private reset() {
+		const init:RequestInit = {
+			method: "GET",
+			credentials:"include"
+		};
+
+		fetch("http://127.0.0.1:8080/reset", init).then(_=>{
+			document.location.reload();
+		});
+	}
 }
 
 new BoardView({ width: 9, depth: 9 }).start();
+
+
+// fitToContainer(document.getElementById('game_over') as HTMLCanvasElement);
+//
+// function fitToContainer(canvas: HTMLCanvasElement){
+// 	// Make it visually fill the positioned parent
+// 	canvas.style.width ='100%';
+// 	canvas.style.height='100%';
+// 	// ...then set the internal size to match
+// 	canvas.width  = canvas.offsetWidth;
+// 	canvas.height = canvas.offsetHeight;
+// }
+
+async function gameOver(){
+
+	let canvasRef = (document.getElementById("game_over") as HTMLCanvasElement);
+	canvasRef.style.zIndex = "2"
+	let ctx = canvasRef.getContext("2d");
+	if(ctx==null){
+		return
+	}
+	let dashLen = 220
+		, dashOffset = dashLen
+		, speed = 5,
+		txt = "Game Over", x = 10, i = 0;
+
+	ctx.font = "50px Comic Sans MS, cursive, TSCu_Comic, sans-serif";
+	ctx.lineWidth = 5; ctx.lineJoin = "round"; ctx.globalAlpha = 2/3;
+	ctx.strokeStyle = ctx.fillStyle = "#1f2f90";
+
+	(function loop() {
+		ctx.clearRect(x, 0, 60, 150);
+		ctx.setLineDash([dashLen - dashOffset, dashOffset - speed]); // create a long dash mask
+		dashOffset -= speed;                                         // reduce dash length
+		ctx.strokeText(txt[i], x, 90);                               // stroke letter
+
+		if (dashOffset > 0) requestAnimationFrame(loop);             // animate
+		else {
+			ctx.fillText(txt[i], x, 90);                               // fill final letter
+			dashOffset = dashLen;                                      // prep next char
+			x += ctx.measureText(txt[i++]).width + ctx.lineWidth * Math.random();
+			ctx.setTransform(1, 0, 0, 1, 0, 3 * Math.random());        // random y-delta
+			ctx.rotate(Math.random() * 0.005);                         // random rotation
+			if (i < txt.length) requestAnimationFrame(loop);
+		}
+	})();
+
+	await new Promise(res => setTimeout(res, 10000));
+	canvasRef.style.zIndex = "-1"
+}

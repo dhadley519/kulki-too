@@ -30,10 +30,27 @@ body{
     border: 4px solid black;
 }
 
+.board_wrapper {
+}
+
+.game_over{
+    border: 1px solid black;
+    z-index: -1;
+    background-color: antiquewhite;
+    display: flex;
+    flex-direction: column;
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    height: 60vmin;
+    width: 60vmin;
+}
+
 .board{
     border: 1px solid black;
     display: flex;
-    flex-direction: column;  
+    flex-direction: column;
     left: 50%;
     position: absolute;
     top: 50%;
@@ -41,6 +58,7 @@ body{
     height: 60vmin;
     width: 60vmin;
     background: rgb(230, 230, 230);
+    z-index: 1;
 }
 
 .board__row{

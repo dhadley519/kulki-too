@@ -11,7 +11,12 @@
     <link href="css/colors.css" rel="stylesheet">
 </head>
 <body>
+
+<div class="board_wrapper" id="board_wrapper">
+<canvas class="game_over" id="game_over"></canvas>
 <div class="board" id="board"></div>
+</div>
+
 <table id="stats">
     <thead>
     <tr>
@@ -28,8 +33,12 @@
         <td style="text-align: right;">Score</td>
         <td id="score" style="text-align: right;">0</td>
     </tr>
+    <tr>
+        <td style="text-align: right;" colspan=2><a href="#" id="reset_link">reset</a></td>
+    </tr>
     </tbody>
 </table>
+
 <script>var exports = {};</script>
 <script src="dist/client-board.js" type="module"></script>
 </body>
