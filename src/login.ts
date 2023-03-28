@@ -16,3 +16,9 @@ login_button?.addEventListener('click', function handleClick(_) {
     xhr.send(`email=${email}&password=${password}`);
 });
 
+document?.getElementById("password")?.addEventListener("keypress", function(event) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        login_button?.click();
+    }
+});
