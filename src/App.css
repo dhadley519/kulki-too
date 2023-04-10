@@ -1,0 +1,138 @@
+.App {
+    background-color: white;
+}
+
+.Auth-form-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+}
+
+.Auth-form {
+    width: 420px;
+    box-shadow: rgb(0 0 0 / 16%) 1px 1px 10px;
+    padding-top: 30px;
+    padding-bottom: 20px;
+    border-radius: 8px;
+    background-color: white;
+}
+
+.Auth-form-content {
+    padding-left: 12%;
+    padding-right: 12%;
+}
+
+.Auth-form-title {
+    text-align: center;
+    margin-bottom: 1em;
+    font-size: 24px;
+    color: rgb(34, 34, 34);
+    font-weight: 800;
+}
+
+label {
+    font-size: 14px;
+    font-weight: 600;
+    color: rgb(34, 34, 34);
+}
+
+
+.color1{ background: lightblue; }
+.color2{ background: blue; }
+.color3{ background: blueviolet; }
+.color4{ background: red; }
+.color5{ background: greenyellow; }
+.color6{ background: yellow; }
+.color7{ background: pink; }
+.color8{ background: orange; }
+.color9{ background: mediumseagreen; }
+
+
+*{
+    padding: 0;
+    margin: 0;
+    font-family: Calibri;
+}
+
+body{
+    overflow: hidden;
+    background: rgba(2, 204, 255, 0.3);
+}
+
+.ball{
+    border-radius: 100px;
+    left: 50%;
+    padding: 35%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.ball.selected{
+    border: 4px solid black;
+}
+
+.board_wrapper {
+}
+
+.game_over{
+    border: 1px solid black;
+    z-index: -1;
+    background-color: antiquewhite;
+    display: flex;
+    flex-direction: column;
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    height: 60vmin;
+    width: 60vmin;
+}
+
+.board{
+    border: 1px solid black;
+    display: flex;
+    flex-direction: column;
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    height: 60vmin;
+    width: 60vmin;
+    background: rgb(230, 230, 230);
+    z-index: 1;
+}
+
+.board__row{
+    border-bottom: 1px solid black;
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    position: relative;
+    width: 100%;
+}
+
+.board__row__tile{
+    border-right: 1px solid black;
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.board__row__tile.selected{
+    background: black;
+}
+
+.board__row__tile.openList{
+    background: rgb(0, 163, 0);
+}
+
+.board__row__tile.closedList{
+    background: rgb(163, 0, 0);
+}
+
+.board__row__tile.finalPath{
+    background: rgb(0, 132, 255);
+}
