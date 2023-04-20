@@ -225,6 +225,7 @@ export default function Game() {
             <div className="board_wrapper" id="board_wrapper">
                 <Board/>
             </div>
+            <div className="sticky-lg-bottom">Stick to the bottom on viewports sized LG (large) or wider</div>
         </>
     )
 }
