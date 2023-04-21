@@ -87,7 +87,7 @@ export default function Game() {
         useEffect(() => {
             const onPageLoad = () => {
                 const init: RequestInit = {method: "GET", credentials: "include"};
-                fetch("http://127.0.0.1:8080/start", init)
+                fetch("/start", init)
                     .then(response => response.json())
                     .then(data => processAddCommands(data as AddBall[]))
                     .catch(reason => console.error(`failure to start game. ${JSON.stringify(reason)}`));
@@ -136,7 +136,7 @@ export default function Game() {
                         from: state.selectedBall, to: action.targetPosition
                     })
                 };
-                fetch("http://127.0.0.1:8080/move", init)
+                fetch("/move", init)
                     .then(response => response.json())
                     .then(data => processAddAndRemoveCommands(data as (GameOver | AddBall | RemoveBall)[]))
                     .catch(reason => console.error(`failure to move. ${JSON.stringify(reason)}`));
