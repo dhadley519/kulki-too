@@ -23,11 +23,11 @@ export default function Auth() {
     }
 
     function authenticate() {
-        return authOrRegister('http://127.0.0.1:8080/login')
+        return authOrRegister('/login')
     }
 
     function register() {
-        return authOrRegister('http://127.0.0.1:8080/register')
+        return authOrRegister('/register')
     }
 
     function authOrRegister(url: string) {
